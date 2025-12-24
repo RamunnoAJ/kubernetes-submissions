@@ -13,9 +13,8 @@ func main() {
 		port = "8080"
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!") // Send response to client
-	})
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/", fs)
 
 	fmt.Printf("Server started in port %s\n", port)
 

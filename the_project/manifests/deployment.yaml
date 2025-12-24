@@ -13,6 +13,6 @@ spec:
         app: the-project
     spec:
       containers:
-        - name: log-output
-          image: the_project:dev
+        - name: the-project
+          image: the_project:1.6
           imagePullPolicy: IfNotPresent
