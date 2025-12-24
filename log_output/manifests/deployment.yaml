@@ -12,7 +12,27 @@ spec:
       labels:
         app: log-output
     spec:
+      volumes:
+        - name: shared-random
+          emptyDir: {}
       containers:
-        - name: log-output
-          image: log_output:1.7
+        - name: log-output-server
+          image: log_output_server:1.10
           imagePullPolicy: IfNotPresent
+          env:
+            - name: RANDOM_FILE
+              value: /app/files/random.txt
+          volumeMounts:
+            - name: shared-random
+              mountPath: /app/files
+        - name: log-output-random
+          image: log_output_random:1.10
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RANDOM_FILE
+              value: /app/files/random.txt
+            - name: INTERVAL_SECONDS
+              value: "5"
+          volumeMounts:
+            - name: shared-random
+              mountPath: /app/files
