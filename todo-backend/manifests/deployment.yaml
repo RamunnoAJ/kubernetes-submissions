@@ -19,7 +19,7 @@ spec:
             name: todo-backend-config
       containers:
         - name: todo-backend
-          image: todo-backend:2.6
+          image: todo-backend:2.8
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -29,3 +29,8 @@ spec:
                 configMapKeyRef:
                   name: todo-backend-config
                   key: PORT
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: todo-db-secret
+                  key: DATABASE_URL
