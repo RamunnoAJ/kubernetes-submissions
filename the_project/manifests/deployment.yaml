@@ -12,7 +12,23 @@ spec:
       labels:
         app: the-project
     spec:
+      securityContext:
+        fsGroup: 65532
+      volumes:
+        - name: image-store
+          persistentVolumeClaim:
+            claimName: the-project-pvc
+      initContainers:
+        - name: fix-permissions
+          image: alpine:3.20
+          command: ["/bin/sh", "-c", "chown -R 65532:65532 /app/images && chmod 775 /app/images"]
+          volumeMounts:
+            - name: image-store
+              mountPath: /app/images
       containers:
         - name: the-project
-          image: the_project:1.6
+          image: the_project:1.12
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: image-store
+              mountPath: /app/images
