@@ -15,5 +15,8 @@ spec:
     spec:
       containers:
         - name: ping-pong
-          image: ping-pong:2.1
+          image: ping-pong:2.7
           imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URL
+              value: "postgres://postgres:postgres@postgres-svc:5432/pingpong?sslmode=disable"
