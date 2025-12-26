@@ -16,18 +16,28 @@ spec:
       volumes:
         - name: shared-random
           emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: log-output-config
       containers:
         - name: log-output-server
-          image: log_output_server:2.1
+          image: log_output_server:2.5
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE
               value: /app/files/random.txt
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-config
+                  key: MESSAGE
           volumeMounts:
             - name: shared-random
               mountPath: /app/files
+            - name: config-volume
+              mountPath: /app/config
         - name: log-output-random
-          image: log_output_random:2.1
+          image: log_output_random:2.5
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE

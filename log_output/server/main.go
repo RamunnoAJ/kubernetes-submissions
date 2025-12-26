@@ -26,6 +26,17 @@ func main() {
 			return
 		}
 
+		// Read ConfigMap file
+		infoPath := "/app/config/information.txt"
+		infoData, err := os.ReadFile(infoPath)
+		fileContent := "failed to read file"
+		if err == nil {
+			fileContent = string(infoData)
+		}
+
+		// Read Env Variable
+		message := os.Getenv("MESSAGE")
+
 		// Fetch pingpong count
 		pingPongCount := "0"
 		resp, err := http.Get("http://ping-pong-svc:8080/pings")
@@ -39,6 +50,8 @@ func main() {
 			log.Printf("Failed to call ping-pong svc: %v", err)
 		}
 
+		fmt.Fprintf(w, "file content: %s\n", fileContent)
+		fmt.Fprintf(w, "env variable: MESSAGE=%s\n", message)
 		fmt.Fprintf(w, "%sPing / Pongs: %s\n", data, pingPongCount)
 	})
 
