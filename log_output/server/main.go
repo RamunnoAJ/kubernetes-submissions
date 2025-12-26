@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -25,12 +26,17 @@ func main() {
 			return
 		}
 
-		ppPath := "/app/files/pingpong_count.txt"
-
-		ppData, err := os.ReadFile(ppPath)
+		// Fetch pingpong count
 		pingPongCount := "0"
+		resp, err := http.Get("http://ping-pong-svc:8080/pings")
 		if err == nil {
-			pingPongCount = string(ppData)
+			body, err := io.ReadAll(resp.Body)
+			if err == nil {
+				pingPongCount = string(body)
+			}
+			resp.Body.Close()
+		} else {
+			log.Printf("Failed to call ping-pong svc: %v", err)
 		}
 
 		fmt.Fprintf(w, "%sPing / Pongs: %s\n", data, pingPongCount)

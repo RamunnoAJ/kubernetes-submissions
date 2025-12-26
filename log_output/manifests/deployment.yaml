@@ -12,22 +12,12 @@ spec:
       labels:
         app: log-output
     spec:
-      securityContext:
-        fsGroup: 65532
       volumes:
         - name: shared-random
-          persistentVolumeClaim:
-            claimName: ping-pong-pvc
-      initContainers:
-        - name: fix-permissions
-          image: alpine:3.20
-          command: ["/bin/sh", "-c", "chown -R 65532:65532 /app/files && chmod 775 /app/files"]
-          volumeMounts:
-            - name: shared-random
-              mountPath: /app/files
+          emptyDir: {}
       containers:
         - name: log-output-server
-          image: log_output_server:1.10
+          image: log_output_server:2.1
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE
@@ -36,7 +26,7 @@ spec:
             - name: shared-random
               mountPath: /app/files
         - name: log-output-random
-          image: log_output_random:1.10
+          image: log_output_random:2.1
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE
