@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: project
   name: the-project
 spec:
   replicas: 1
@@ -27,5 +28,5 @@ spec:
               mountPath: /app/images
       containers:
         - name: the-project
-          image: the_project:2.2
+          image: the_project:2.3
           imagePullPolicy: IfNotPresent
