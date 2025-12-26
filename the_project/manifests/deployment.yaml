@@ -27,7 +27,7 @@ spec:
               mountPath: /app/images
       containers:
         - name: the-project
-          image: the_project:1.12
+          image: the_project:1.13
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: image-store
