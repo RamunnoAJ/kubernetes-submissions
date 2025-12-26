@@ -12,9 +12,19 @@ spec:
       labels:
         app: log-output
     spec:
+      securityContext:
+        fsGroup: 65532
       volumes:
         - name: shared-random
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: ping-pong-pvc
+      initContainers:
+        - name: fix-permissions
+          image: alpine:3.20
+          command: ["/bin/sh", "-c", "chown -R 65532:65532 /app/files && chmod 775 /app/files"]
+          volumeMounts:
+            - name: shared-random
+              mountPath: /app/files
       containers:
         - name: log-output-server
           image: log_output_server:1.10

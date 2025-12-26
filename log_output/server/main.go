@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,10 +21,19 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data, err := os.ReadFile(path)
 		if err != nil {
-			http.Error(w, "cannot read random.txt", http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("cannot read random.txt: %v", err), http.StatusInternalServerError)
 			return
 		}
-		w.Write(data)
+
+		ppPath := "/app/files/pingpong_count.txt"
+
+		ppData, err := os.ReadFile(ppPath)
+		pingPongCount := "0"
+		if err == nil {
+			pingPongCount = string(ppData)
+		}
+
+		fmt.Fprintf(w, "%sPing / Pongs: %s\n", data, pingPongCount)
 	})
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))

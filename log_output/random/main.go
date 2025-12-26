@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
@@ -32,11 +33,15 @@ func main() {
 		}
 	}
 
-	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		log.Fatalf("Failed to create directory: %v", err)
+	}
 
 	for {
 		content := time.Now().Format("2006-01-02T15:04:05.705Z") + ": " + randomString(12) + "\n"
-		_ = os.WriteFile(path, []byte(content), 0o644)
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+			log.Fatalf("Failed to write file: %v", err)
+		}
 		time.Sleep(interval)
 	}
 }

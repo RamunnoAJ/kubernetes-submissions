@@ -12,7 +12,14 @@ spec:
       labels:
         app: ping-pong
     spec:
+      volumes:
+        - name: shared-pingpong
+          persistentVolumeClaim:
+            claimName: ping-pong-pvc
       containers:
         - name: ping-pong
           image: ping-pong:1.9
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: shared-pingpong
+              mountPath: /app/files
