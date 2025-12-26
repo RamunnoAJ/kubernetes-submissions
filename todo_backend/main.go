@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -48,7 +49,8 @@ func initDB() {
 }
 
 func getTodos(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT id, text FROM todos")
+
+rows, err := db.Query("SELECT id, text FROM todos")
 	if err != nil {
 		http.Error(w, "Failed to fetch todos", http.StatusInternalServerError)
 		log.Printf("Query error: %v", err)
@@ -75,27 +77,52 @@ func getTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 func createTodo(w http.ResponseWriter, r *http.Request) {
+	// Read body to log it, then restore it or decode from buffer
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read body", http.StatusBadRequest)
+		return
+	}
+	
+	// Log the raw body or decoded struct
 	var t Todo
-	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+	if err := json.Unmarshal(body, &t); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	log.Printf("Received todo creation request: %s", t.Text)
+
 	if len(t.Text) > 140 {
-		http.Error(w, "Todo text too long (max 140 chars)", http.StatusBadRequest)
+		msg := fmt.Sprintf("Todo text too long (max 140 chars). Received %d chars.", len(t.Text))
+		log.Printf("REJECTED: %s", msg)
+		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
-	err := db.QueryRow("INSERT INTO todos (text) VALUES ($1) RETURNING id", t.Text).Scan(&t.ID)
+	err = db.QueryRow("INSERT INTO todos (text) VALUES ($1) RETURNING id", t.Text).Scan(&t.ID)
 	if err != nil {
 		http.Error(w, "Failed to save todo", http.StatusInternalServerError)
 		log.Printf("Insert error: %v", err)
 		return
 	}
 
+	log.Printf("Successfully created todo with ID: %d", t.ID)
+
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(t)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		log.Printf("Started %s %s", r.Method, r.URL.Path)
+		
+		next.ServeHTTP(w, r)
+		
+		log.Printf("Completed %s %s in %v", r.Method, r.URL.Path, time.Since(start))
+	})
 }
 
 func main() {
@@ -106,7 +133,8 @@ func main() {
 
 	initDB()
 
-	http.HandleFunc("/todos", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/todos", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			getTodos(w, r)
 			return
@@ -120,6 +148,9 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
+	// Wrap mux with logging middleware
+	handler := loggingMiddleware(mux)
+
 	fmt.Printf("Todo Backend started in port %s\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
