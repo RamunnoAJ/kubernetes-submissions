@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-project-config
+  namespace: project
+data:
+  PORT: "8080"

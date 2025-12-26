@@ -13,9 +13,19 @@ spec:
       labels:
         app: todo-backend
     spec:
+      volumes:
+        - name: config-volume
+          configMap:
+            name: todo-backend-config
       containers:
         - name: todo-backend
-          image: todo-backend:2.3
+          image: todo-backend:2.6
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-backend-config
+                  key: PORT
