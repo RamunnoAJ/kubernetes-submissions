@@ -60,8 +60,8 @@ func main() {
 
 	initDB()
 
-	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/pingpong" {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
 		}
@@ -82,7 +82,7 @@ func main() {
 		fmt.Fprintf(w, "%d", count)
 	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "OK")
 	})
