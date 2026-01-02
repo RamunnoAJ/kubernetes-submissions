@@ -4,6 +4,7 @@ metadata:
   namespace: project
   name: the-project-svc
 spec:
+  type: NodePort
   selector:
     app: the-project # This is the app as declared in the deployment.
   ports:
