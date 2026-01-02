@@ -4,7 +4,6 @@ metadata:
   namespace: exercises
   name: shared-ingress
 spec:
-  ingressClassName: traefik
   rules:
     - http:
         paths:
@@ -21,4 +20,4 @@ spec:
               service:
                 name: log-output-svc
                 port:
-                  number: 8080
+                  number: 80

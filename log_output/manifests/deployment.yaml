@@ -21,7 +21,7 @@ spec:
             name: log-output-config
       containers:
         - name: log-output-server
-          image: log_output_server:2.5
+          image: southamerica-east1-docker.pkg.dev/kubernetos-lerno/exercises/log_output_server:2.5
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE
@@ -37,7 +37,7 @@ spec:
             - name: config-volume
               mountPath: /app/config
         - name: log-output-random
-          image: log_output_random:2.5
+          image: southamerica-east1-docker.pkg.dev/kubernetos-lerno/exercises/log_output_random:2.5
           imagePullPolicy: IfNotPresent
           env:
             - name: RANDOM_FILE

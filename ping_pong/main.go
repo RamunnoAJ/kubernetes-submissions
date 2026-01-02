@@ -82,6 +82,11 @@ func main() {
 		fmt.Fprintf(w, "%d", count)
 	})
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "OK")
+	})
+
 	fmt.Printf("Server started in port %s\n", port)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)

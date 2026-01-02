@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ping-pong
-          image: southamerica-east1-docker.pkg.dev/kubernetos-lerno/exercises/ping-pong:2.7
+          image: southamerica-east1-docker.pkg.dev/kubernetos-lerno/exercises/ping-pong:3.1
           imagePullPolicy: IfNotPresent
           env:
             - name: DATABASE_URL
